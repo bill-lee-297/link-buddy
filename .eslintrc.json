@@ -79,11 +79,21 @@
         "@typescript-eslint/ban-types": "off",
         "no-console": "off",
         "jsx-a11y/anchor-is-valid": "off",
-        "jsx-a11y/click-events-have-key-events": "off"
+        "jsx-a11y/click-events-have-key-events": "off",
+        "import/no-unresolved": "error"
     },
     "settings": {
+        "import/parsers": {
+            "@typescript-eslint/parser": [".ts", ".tsx"]
+        },
         "import/resolver": {
-            "typescript": {}
+            "typescript": {
+                "alwaysTryTypes": true
+            },
+            "node": {
+                "extensions": [".js", ".jsx", ".ts", ".tsx"]
+            },
+            "caseSensitive": false
         }
     }
 }
