@@ -24,6 +24,7 @@
     },
     "plugins": ["react", "prettier", "@typescript-eslint", "import"],
     "rules": {
+        "camelcase": "off",
         "react/button-has-type": "off",
         "import/extensions": "off",
         "react/prop-types": "off",

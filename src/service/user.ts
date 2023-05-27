@@ -10,7 +10,16 @@ type OAuthUser = {
 export default async function addUser(user: OAuthUser) {
     const client = await db.connect();
 
-    const result = await client.sql`SELECT * FROM users WHERE user_email = ${user.email};`;
+    const result = await client.sql`
+            SELECT 
+                user_idx as userIdx, 
+                user_name as userName, 
+                user_email as userEmail, 
+                user_id as userId 
+            FROM 
+                users 
+            WHERE 
+                user_email = ${user.email};`;
 
     if (result.rows.length > 0) {
         return true;

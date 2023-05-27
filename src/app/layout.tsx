@@ -18,9 +18,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <html lang="en">
             <body className={`${inter.className}`}>
                 <AuthContext>
-                    <main className="mx-auto max-w-[1200px]">
+                    <main className="mx-auto">
                         <Header />
-                        {children}
+                        <div className="mx-auto max-w-[1200px]">{children}</div>
                     </main>
                 </AuthContext>
             </body>
