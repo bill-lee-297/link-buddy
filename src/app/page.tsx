@@ -1,11 +1,10 @@
-import { useSession } from 'next-auth/react';
-
 import BookmarksArea from '@/components/BookmarksArea';
 
 export default function Home() {
     return (
         <main className="flex min-h-screen flex-col">
-            <h1>LinkBuddy</h1>
+            {/* TODO: 상태에 따라서 문구를 보여주는 컴포넌트 생성 */}
+
             {/* @ts-expect-error Server Component */}
             <BookmarksArea />
         </main>
