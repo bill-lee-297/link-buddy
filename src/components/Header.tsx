@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import { useSession, signIn, signOut } from 'next-auth/react';
 
 export default function Header() {
@@ -19,10 +18,10 @@ export default function Header() {
                                 <li className="">
                                     <img
                                         className="rounded-2xl"
-                                        src={session?.user?.image ?? ''}
+                                        src={session?.user?.image}
                                         width="30"
                                         height="30"
-                                        alt="profile image"
+                                        alt="profile"
                                     />
                                 </li>
                             )}
