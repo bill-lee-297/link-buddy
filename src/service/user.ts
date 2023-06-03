@@ -25,7 +25,12 @@ export default async function addUser(user: OAuthUser) {
         return true;
     }
 
-    await client.sql`INSERT INTO users (user_name, user_email, user_id) VALUES (${user.name}, ${user.email}, ${user.id})`;
+    const insertResult =
+        await client.sql`INSERT INTO users (user_name, user_email, user_id) VALUES (${user.name}, ${user.email}, ${user.id}) RETURNING user_idx`;
+
+    const userIdx = insertResult.rows[0].user_idx;
+
+    await client.sql`INSERT INTO folders (folder_name, folder_order, folders_user_idx) VALUES ('default', 0, ${userIdx})`;
 
     return true;
 }
