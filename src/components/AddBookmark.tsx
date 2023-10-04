@@ -6,10 +6,12 @@ import AddBookmarkForm from '@/components/AddBookmarkForm';
 import ModalPortal from '@/components/modal/ModalPortal';
 
 export default function AddBookmark() {
+    const [link, setLink] = useState('');
     const [openModal, setOpenModal] = useState(false);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.value.length > 0) {
+            setLink(e.target.value);
             setOpenModal(true);
         }
     };
@@ -25,7 +27,7 @@ export default function AddBookmark() {
 
             {openModal && (
                 <ModalPortal>
-                    <AddBookmarkForm onClose={() => setOpenModal(false)} />
+                    <AddBookmarkForm onClose={() => setOpenModal(false)} link={link} />
                 </ModalPortal>
             )}
         </div>

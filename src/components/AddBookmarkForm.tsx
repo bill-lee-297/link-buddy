@@ -1,10 +1,18 @@
-import React from 'react';
+import React, {useState} from 'react';
 
 type Props = {
+    link: string;
     onClose: () => void;
 };
 
-export default function AddBookmarkForm({ onClose }: Props) {
+export default function AddBookmarkForm({ onClose, link }: Props) {
+    const [url, setUrl] = useState(link);
+    const [name, setName] = useState("");
+    const [folder, setFolder] = useState(0);
+    const submit = () => {
+        console.log(url, name, folder)
+    }
+
     return (
         <section
             className="z-99 fixed left-0 top-0 flex h-full w-full flex-col items-center justify-center bg-neutral-900/70"
@@ -21,6 +29,8 @@ export default function AddBookmarkForm({ onClose }: Props) {
                             id="email"
                             className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
                             placeholder="여기에 이름을 입력해주세요."
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
                             required
                         />
                     </div>
@@ -40,6 +50,8 @@ export default function AddBookmarkForm({ onClose }: Props) {
                             id="email"
                             className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
                             placeholder="여기에 링크를 입력해주세요."
+                            value={url}
+                            onChange={(e) => setUrl(e.target.value)}
                             required
                         />
                     </div>
@@ -54,6 +66,7 @@ export default function AddBookmarkForm({ onClose }: Props) {
                     </button>
                     <button
                         type="button"
+                        onClick={() => submit()}
                         className="rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300"
                     >
                         등록
