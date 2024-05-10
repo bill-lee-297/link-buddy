@@ -1,19 +1,34 @@
 import axios from 'axios';
 
-export function getApi(url: string, requestData?: object) {
-    return axios({
-        method: 'get',
-        url: process.env.NEXT_PUBLIC_BASE_URL + url,
-        params: requestData
-    })
-        .then((response) => response)
-        .then((data) => data.data.data.rows);
-}
+type GetProps = {
+    endpoint: string;
+    method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+    body?: object;
+    params?: object;
+};
 
-export function postApi(url: string, requestData?: object) {
-    return axios({
-        method: 'get',
-        url,
-        data: requestData
+const API = async ({ endpoint, method, body, params }: GetProps) => {
+    const {
+        data: responseData,
+        status,
+        headers
+    } = await axios({
+        url: endpoint,
+        method,
+        data: body,
+        params
     });
-}
+
+    return {
+        data: responseData.data,
+        status,
+        headers: { ...responseData.headers }
+    };
+};
+
+const isValidUrl = (url: string) => {
+    const urlRegex = /^(ftp|http|https):\/\/[^ "]+$/;
+    return urlRegex.test(url);
+};
+
+export { API, isValidUrl };

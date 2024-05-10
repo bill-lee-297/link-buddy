@@ -20,11 +20,25 @@ type folder = {
     folderOrder: number;
 };
 
+type insertBookmark = {
+    url: string;
+    name: string;
+    order: number;
+    faviconImage: string;
+};
+
 export type bookmarks = bookmark & folder;
 
 const getBookmarks = async () => {
     const session = await getServerSession(AuthOptions);
     const userEmail = session?.user?.email;
+
+    if (!userEmail) {
+        return {
+            status: 401,
+            message: '로그인이 필요한 기능입니다.'
+        };
+    }
 
     const client = await db.connect();
     const data = await client.sql`
@@ -87,4 +101,64 @@ const getBookmarks = async () => {
     });
 };
 
-export default getBookmarks;
+const postBookmarks = async (bookmark: insertBookmark) => {
+    const session = await getServerSession(AuthOptions);
+    const userEmail = session?.user?.email;
+
+    if (!userEmail) {
+        return {
+            status: 'error',
+            message: '로그인 정보가 필요합니다.'
+        };
+    }
+
+    const client = await db.connect();
+
+    const result = await client.sql`
+            SELECT 
+                user_idx,
+                folder_idx
+            FROM 
+                users as users
+            LEFT JOIN
+                folders as folders 
+                ON users.user_idx = folders.folders_user_idx
+            WHERE 
+                user_email = ${userEmail} AND folders.folder_order = 0`;
+
+    if (result.rows.length === 0) {
+        return {
+            status: 'error',
+            message: '사용자 정보와 폴더 정보를 찾을 수 없습니다.'
+        };
+    }
+
+    const userIdx = result.rows[0].user_idx;
+    const bookmark_name = bookmark.name;
+    const bookmark_link = bookmark.url;
+    const bookmark_image = bookmark.faviconImage;
+    const bookmark_order = bookmark.order;
+    const bookmark_folder_idx = result.rows[0].folder_idx;
+
+    const data = await client.sql`
+        INSERT INTO bookmarks
+            (bookmark_name, bookmark_link, bookmark_image, bookmark_order, bookmark_folder_idx, bookmark_user_idx)
+        VALUES
+            (${bookmark_name}, ${bookmark_link}, ${bookmark_image}, ${bookmark_order}, ${bookmark_folder_idx}, ${userIdx})`;
+
+    console.log('INSERT :: ', data);
+
+    if (data.rowCount === 1) {
+        return {
+            status: 'success',
+            message: '성공적으로 등록되었습니다.'
+        };
+    }
+
+    return {
+        status: 'error',
+        message: '등록이 실패하였습니다.'
+    };
+};
+
+export { getBookmarks, postBookmarks };

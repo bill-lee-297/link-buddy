@@ -1,17 +1,86 @@
-import React, {useState} from 'react';
+'use client';
+
+import React, { useEffect, useRef, useState } from 'react';
+
+import { API } from '@/lib/utils';
 
 type Props = {
-    link: string;
     onClose: () => void;
+    link: string;
 };
 
 export default function AddBookmarkForm({ onClose, link }: Props) {
-    const [url, setUrl] = useState(link);
-    const [name, setName] = useState("");
-    const [folder, setFolder] = useState(0);
-    const submit = () => {
-        console.log(url, name, folder)
-    }
+    const nameElement = useRef(null);
+    const [inputLink, setInputLink] = useState(link);
+    const [name, setName] = useState('');
+    const [faviconImag_, setFaviconImage] = useState('');
+
+    const getCrawlingData = async (type: 'name' | 'favicon') => {
+        console.log('exec');
+        const result = await API({
+            endpoint: '/api/crawling',
+            method: 'GET',
+            params: {
+                inputLink
+            }
+        });
+
+        console.log(result);
+
+        if (result.status === 200) {
+            if (type === 'name') {
+                setName(result.data.title);
+                return result.data.title;
+            }
+            if (type === 'favicon') {
+                setFaviconImage(result.data.faviconURL);
+                return result.data.faviconURL;
+            }
+        }
+        return false;
+    };
+
+    const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        console.log('handleUrlChange');
+        setInputLink(e.target.value);
+        setFaviconImage('');
+    };
+
+    const handleSubmit = async () => {
+        if (inputLink.length === 0) {
+            alert('북마크의 URL을 입력해주세요.');
+            return;
+        }
+        if (name.length === 0) {
+            alert('북마크의 이름을 입력해주세요.');
+            return;
+        }
+        const favicon = await getCrawlingData('favicon');
+
+        const responseData = await API({
+            endpoint: '/api/bookmark',
+            method: 'POST',
+            body: {
+                url: inputLink,
+                name,
+                order: 0,
+                faviconImage: favicon
+            }
+        });
+
+        if (responseData.status === 200) {
+            alert('북마크가 추가되었습니다.');
+            onClose();
+        }
+    };
+
+    useEffect(() => {
+        if (nameElement.current) {
+            (nameElement.current as HTMLInputElement).focus();
+        }
+
+        getCrawlingData('name');
+    }, []);
 
     return (
         <section
@@ -26,32 +95,33 @@ export default function AddBookmarkForm({ onClose, link }: Props) {
                         <div className="w-24">이름</div>
                         <input
                             type="text"
-                            id="email"
                             className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
                             placeholder="여기에 이름을 입력해주세요."
-                            value={name}
+                            ref={nameElement}
                             onChange={(e) => setName(e.target.value)}
+                            value={name}
                             required
                         />
                     </div>
                     <div className="flex flex-row items-center justify-start">
                         <div className="w-24">폴더 선택</div>
                         <select
-                            id="countries"
+                            id="folder"
                             className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm"
                         >
-                            <option selected>Default</option>
+                            <option value="0" selected>
+                                Default
+                            </option>
                         </select>
                     </div>
                     <div className="flex flex-row items-center justify-start">
                         <div className="w-24">URL</div>
                         <input
+                            value={inputLink}
+                            onChange={handleUrlChange}
                             type="text"
-                            id="email"
                             className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
                             placeholder="여기에 링크를 입력해주세요."
-                            value={url}
-                            onChange={(e) => setUrl(e.target.value)}
                             required
                         />
                     </div>
@@ -66,8 +136,8 @@ export default function AddBookmarkForm({ onClose, link }: Props) {
                     </button>
                     <button
                         type="button"
-                        onClick={() => submit()}
                         className="rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300"
+                        onClick={() => handleSubmit()}
                     >
                         등록
                     </button>
