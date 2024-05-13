@@ -58,14 +58,16 @@ const BookmarkList = ({ data, folderName }: Props) => {
 
             <ul className="w-[400px]">
                 {data.map((v) => (
-                    <li key={v.bookmarkIdx} className="mb-6 flex items-center justify-start">
-                        <div className="mr-2 h-[20px] w-[20px]">
-                            <Favicon bookmarkImage={v.bookmarkImage} bookmarkName={v.bookmarkName} />
-                        </div>
-                        <div className="w-[260px] truncate">
-                            <a href={v.bookmarkLink} className="text-sm font-semibold">
-                                {v.bookmarkName}
-                            </a>
+                    <li key={v.bookmarkIdx} className="mb-6 flex items-center justify-between">
+                        <div className="flex flex-row">
+                            <div className="mr-2 h-[20px] w-[20px]">
+                                <Favicon bookmarkImage={v.bookmarkImage} bookmarkName={v.bookmarkName} />
+                            </div>
+                            <div className="w-[260px] truncate">
+                                <a href={v.bookmarkLink} className="text-sm font-semibold">
+                                    {v.bookmarkName}
+                                </a>
+                            </div>
                         </div>
                         <div>
                             <button
