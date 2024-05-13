@@ -27,7 +27,15 @@ export default function AddBookmark() {
     };
 
     return (
-        <div className="w-200 my-4 flex justify-center gap-4 border-b p-6">
+        <div className="w-200 my-4 flex flex-col items-center justify-center gap-4 border-b p-6">
+            <a
+                className="text-sm text-gray-600 underline"
+                href="https://kukjin.notion.site/LinkBuddy-aa990d424ad545df8439a0d2c969294c"
+                target="_blank"
+                rel="noreferrer"
+            >
+                LinkBuddy가 궁금하신가요?
+            </a>
             <input
                 type="text"
                 className="w-4/5 rounded-lg border-2 border-gray-200 px-2 py-4 pl-4 sm:w-4/5 md:w-3/5 lg:w-2/5"

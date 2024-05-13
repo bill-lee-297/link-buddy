@@ -9,7 +9,9 @@ export default function Header() {
         <header className="flex w-full justify-center border-b-2 border-gray-200 px-10 py-6">
             <div className="h-30 flex w-full max-w-[1200px] items-center justify-between">
                 <div className="flex items-center">
-                    <a className="font text-lg font-semibold" href="/">Link Buddy</a>
+                    <a className="font text-lg font-semibold" href="/">
+                        Link Buddy
+                    </a>
                 </div>
                 <div className="">
                     <nav className="flex items-center">
