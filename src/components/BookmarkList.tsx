@@ -1,4 +1,9 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
+
 import BookmarkIcon from '@/components/Icons/BookmarkIcon';
+import { API } from '@/lib/utils';
 import { bookmark } from '@/service/bookmark';
 
 type Props = {
@@ -6,7 +11,30 @@ type Props = {
     folderName: string;
 };
 
-export default function BookmarkList({ data, folderName }: Props) {
+const BookmarkList = async ({ data, folderName }: Props) => {
+    const router = useRouter();
+
+    const handleDeleteBookmark = async (idx: number) => {
+        if (window.confirm('삭제하시겠습니까?')) {
+            const responseData = await API({
+                endpoint: '/api/bookmark',
+                method: 'DELETE',
+                body: {
+                    bookmarkIdx: idx
+                }
+            });
+
+            if (responseData.status === 200) {
+                alert('북마크가 삭제되었습니다.');
+            } else {
+                alert('삭제가 정상적으로 처리되지 않았습니다.');
+            }
+            router.refresh();
+        }
+
+        return true;
+    };
+
     return (
         <div className="flex flex-col">
             {data.length === 0 ? (
@@ -17,7 +45,7 @@ export default function BookmarkList({ data, folderName }: Props) {
                 <div className="mb-4 text-3xl text-gray-600">{folderName}</div>
             )}
 
-            <ul className="w-[300px]">
+            <ul className="w-[400px]">
                 {data.map((v) => (
                     <li key={v.bookmarkIdx} className="mb-6 flex items-center justify-start">
                         <div className="mr-2 h-[20px] w-[20px]">
@@ -31,14 +59,23 @@ export default function BookmarkList({ data, folderName }: Props) {
                                 />
                             )}
                         </div>
-                        <div className="w-full truncate">
+                        <div className="w-[260px] truncate">
                             <a href={v.bookmarkLink} className="text-sm font-semibold">
                                 {v.bookmarkName}
                             </a>
                         </div>
+                        <button
+                            type="button"
+                            className="mb-2 me-2 rounded-lg bg-red-700 px-3 py-2 text-xs font-medium text-white hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+                            onClick={() => handleDeleteBookmark(v.bookmarkIdx)}
+                        >
+                            삭제
+                        </button>
                     </li>
                 ))}
             </ul>
         </div>
     );
-}
+};
+
+export default BookmarkList;

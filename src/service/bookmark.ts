@@ -146,8 +146,6 @@ const postBookmarks = async (bookmark: insertBookmark) => {
         VALUES
             (${bookmark_name}, ${bookmark_link}, ${bookmark_image}, ${bookmark_order}, ${bookmark_folder_idx}, ${userIdx})`;
 
-    console.log('INSERT :: ', data);
-
     if (data.rowCount === 1) {
         return {
             status: 'success',
@@ -161,4 +159,50 @@ const postBookmarks = async (bookmark: insertBookmark) => {
     };
 };
 
-export { getBookmarks, postBookmarks };
+const deleteBookmark = async (bookmarkIdx: number) => {
+    const session = await getServerSession(AuthOptions);
+    const userEmail = session?.user?.email;
+
+    if (!userEmail) {
+        return {
+            status: 'error',
+            message: '로그인 정보가 필요합니다.'
+        };
+    }
+
+    const client = await db.connect();
+
+    const result = await client.sql`
+            SELECT 
+                user_idx
+            FROM 
+                users as users
+            WHERE 
+                user_email = ${userEmail}`;
+
+    if (result.rows.length === 0) {
+        return {
+            status: 'error',
+            message: '사용자 정보를 찾을 수 없습니다.'
+        };
+    }
+
+    const userIdx = result.rows[0].user_idx;
+
+    const data = await client.sql`
+        DELETE FROM bookmarks WHERE bookmark_idx = ${bookmarkIdx} AND bookmark_user_idx = ${userIdx}`;
+
+    if (data.rowCount === 1) {
+        return {
+            status: 'success',
+            message: '성공적으로 삭제되었습니다.'
+        };
+    }
+
+    return {
+        status: 'error',
+        message: '삭제를 실패하였습니다.'
+    };
+};
+
+export { getBookmarks, postBookmarks, deleteBookmark };

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-import { postBookmarks } from '@/service/bookmark';
+import { deleteBookmark, postBookmarks } from '@/service/bookmark';
 
 const POST = async (request: Request) => {
     const req = await request.json();
@@ -19,4 +19,21 @@ const POST = async (request: Request) => {
     });
 };
 
-export { POST };
+const DELETE = async (request: Request) => {
+    const req = await request.json();
+    const { bookmarkIdx } = req;
+
+    const responseData = await deleteBookmark(bookmarkIdx);
+
+    if (responseData.status === 'success') {
+        return NextResponse.json({
+            data: responseData.message
+        });
+    }
+
+    return NextResponse.json({
+        data: responseData.message
+    });
+};
+
+export { POST, DELETE };

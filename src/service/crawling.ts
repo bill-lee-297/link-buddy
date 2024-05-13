@@ -6,15 +6,14 @@ import { isValidUrl } from '@/lib/utils';
 const crawling = async (inputLink: string) => {
     const responseData = await axios.get(inputLink);
 
-    const hostURL = responseData.config.url || inputLink;
+    const { protocol } = responseData.request;
+    const hostURL = responseData.request.host || inputLink;
     const $ = cheerio.load(responseData.data);
     const title = $('head title').html();
     let favicon = $('link[rel="icon"]').attr('href');
     if (!favicon) {
         favicon = $('link[rel="shortcut icon"]').attr('href');
     }
-
-    console.log('favicon :: ', favicon);
 
     let faviconURL;
 
@@ -23,12 +22,10 @@ const crawling = async (inputLink: string) => {
             favicon = `/${favicon}`;
         }
 
-        faviconURL = hostURL + favicon;
+        faviconURL = `${protocol}//${hostURL}${favicon}`;
     } else {
         faviconURL = String(favicon);
     }
-
-    console.log(faviconURL);
 
     return {
         title,
