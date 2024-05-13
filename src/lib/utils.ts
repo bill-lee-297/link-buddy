@@ -27,7 +27,7 @@ const API = async ({ endpoint, method, body, params }: GetProps) => {
 };
 
 const isValidUrl = (url: string) => {
-    const urlRegex = /^(ftp|http|https):\/\/[^ "]+$/;
+    const urlRegex = /^(http|https):\/\/[^ "]+$/;
     return urlRegex.test(url);
 };
 

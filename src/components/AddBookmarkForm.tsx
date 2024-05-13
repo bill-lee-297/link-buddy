@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 
-import { API } from '@/lib/utils';
+import { API, isValidUrl } from '@/lib/utils';
 
 type Props = {
     onClose: () => void;
@@ -22,26 +22,31 @@ export default function AddBookmarkForm({ onClose, link }: Props) {
         if (type === 'name') {
             setNameLoading(true);
         }
-        const result = await API({
-            endpoint: '/api/crawling',
-            method: 'GET',
-            params: {
-                inputLink
-            }
-        });
+        try {
+            const result = await API({
+                endpoint: '/api/crawling',
+                method: 'GET',
+                params: {
+                    inputLink
+                }
+            });
 
-        if (result.status === 200) {
-            if (type === 'name') {
-                setName(result.data.title);
-                setNameLoading(false);
-                return result.data.title;
+            if (result.status === 200) {
+                if (type === 'name') {
+                    setName(result.data.title);
+                    setNameLoading(false);
+                    return result.data.title;
+                }
+                if (type === 'favicon') {
+                    setFaviconImage(result.data.faviconURL);
+                    return result.data.faviconURL;
+                }
             }
-            if (type === 'favicon') {
-                setFaviconImage(result.data.faviconURL);
-                return result.data.faviconURL;
-            }
+        } catch (e) {
+            setNameLoading(false);
         }
-        return false;
+
+        return true;
     };
 
     const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -60,25 +65,29 @@ export default function AddBookmarkForm({ onClose, link }: Props) {
         }
         setSubmitLoading(true);
 
-        const favicon = await getCrawlingData('favicon');
+        try {
+            const favicon = await getCrawlingData('favicon');
 
-        const responseData = await API({
-            endpoint: '/api/bookmark',
-            method: 'POST',
-            body: {
-                url: inputLink,
-                name,
-                order: 0,
-                faviconImage: favicon
+            const responseData = await API({
+                endpoint: '/api/bookmark',
+                method: 'POST',
+                body: {
+                    url: inputLink,
+                    name,
+                    order: 0,
+                    faviconImage: favicon
+                }
+            });
+
+            if (responseData.status === 200) {
+                alert('북마크가 추가되었습니다.');
+                onClose();
             }
-        });
+        } catch (error) {
+            alert('오류가 발생하였습니다.');
+        }
 
         setSubmitLoading(false);
-
-        if (responseData.status === 200) {
-            alert('북마크가 추가되었습니다.');
-            onClose();
-        }
     };
 
     const keyModalClose = (e: KeyboardEvent) => {
@@ -160,16 +169,21 @@ export default function AddBookmarkForm({ onClose, link }: Props) {
                             </option>
                         </select>
                     </div>
-                    <div className="flex flex-row items-center justify-start">
-                        <div className="w-24">URL</div>
-                        <input
-                            value={inputLink}
-                            onChange={handleUrlChange}
-                            type="text"
-                            className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-                            placeholder="여기에 링크를 입력해주세요."
-                            required
-                        />
+                    <div className="flex flex-col">
+                        <div className="flex flex-row  items-center justify-start">
+                            <div className="w-24">URL</div>
+                            <input
+                                value={inputLink}
+                                onChange={handleUrlChange}
+                                type="text"
+                                className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                                placeholder="여기에 링크를 입력해주세요."
+                                required
+                            />
+                        </div>
+                        {!isValidUrl(inputLink) && (
+                            <div className="mt-4 text-right text-gray-600">URL이 맞나요? 다시 한번 확인해주세요.</div>
+                        )}
                     </div>
                 </div>
                 <div className="flex flex-row items-center justify-end gap-4 px-4 py-6">
