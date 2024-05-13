@@ -1,8 +1,11 @@
 'use client';
 
+import { SyntheticEvent, useEffect, useState } from 'react';
+
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
-import BookmarkIcon from '@/components/Icons/BookmarkIcon';
+import Favicon from '@/components/Icons/Favicon';
 import { API } from '@/lib/utils';
 import { bookmark } from '@/service/bookmark';
 
@@ -11,8 +14,9 @@ type Props = {
     folderName: string;
 };
 
-const BookmarkList = async ({ data, folderName }: Props) => {
+const BookmarkList = ({ data, folderName }: Props) => {
     const router = useRouter();
+    const [currentUrl, setCurrentUrl] = useState('');
 
     const handleDeleteBookmark = async (idx: number) => {
         if (window.confirm('삭제하시겠습니까?')) {
@@ -34,6 +38,13 @@ const BookmarkList = async ({ data, folderName }: Props) => {
 
         return true;
     };
+    const handleImgError = (e: SyntheticEvent<HTMLImageElement, Event>) => {
+        e.currentTarget.src = `${currentUrl}bookmark_ic.png`;
+    };
+
+    useEffect(() => {
+        setCurrentUrl(window.location.href);
+    }, []);
 
     return (
         <div className="flex flex-col">
@@ -49,28 +60,22 @@ const BookmarkList = async ({ data, folderName }: Props) => {
                 {data.map((v) => (
                     <li key={v.bookmarkIdx} className="mb-6 flex items-center justify-start">
                         <div className="mr-2 h-[20px] w-[20px]">
-                            {v.bookmarkImage === 'null' || v.bookmarkImage === '' ? (
-                                <BookmarkIcon />
-                            ) : (
-                                <img
-                                    src={v.bookmarkImage}
-                                    alt={`${v.bookmarkName}의 favicon`}
-                                    className="h-full w-full"
-                                />
-                            )}
+                            <Favicon bookmarkImage={v.bookmarkImage} bookmarkName={v.bookmarkName} />
                         </div>
                         <div className="w-[260px] truncate">
                             <a href={v.bookmarkLink} className="text-sm font-semibold">
                                 {v.bookmarkName}
                             </a>
                         </div>
-                        <button
-                            type="button"
-                            className="mb-2 me-2 rounded-lg bg-red-700 px-3 py-2 text-xs font-medium text-white hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
-                            onClick={() => handleDeleteBookmark(v.bookmarkIdx)}
-                        >
-                            삭제
-                        </button>
+                        <div>
+                            <button
+                                type="button"
+                                className="rounded-lg bg-red-700 px-3 py-2 text-xs font-medium text-white hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+                                onClick={() => handleDeleteBookmark(v.bookmarkIdx)}
+                            >
+                                삭제
+                            </button>
+                        </div>
                     </li>
                 ))}
             </ul>

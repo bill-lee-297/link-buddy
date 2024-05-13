@@ -4,7 +4,6 @@ import './globals.css';
 
 import Header from '@/components/Header';
 import AuthContext from '@/context/AuthContext';
-import Footer from '@/components/Footer';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -23,7 +22,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                         <div className="mx-auto max-w-[1200px]">{children}</div>
                     </main>
                 </AuthContext>
-                <Footer />
 
                 <div id="portal" />
             </body>
