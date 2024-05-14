@@ -236,7 +236,7 @@ export default function BookmarkInputForm({ onClose, link, type, bookmarkIdx }: 
                                     target="_blank"
                                     rel="noreferrer"
                                 >
-                                    URL은 이렇게 입력해주세요.
+                                    URL은 이렇게 입력해주세요!
                                 </a>
                             </div>
                         )}
