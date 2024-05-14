@@ -32,12 +32,12 @@ const BookmarkList = ({ data, folderName }: Props) => {
                 }
             });
 
+            router.refresh();
             if (responseData.status === 200) {
                 alert('북마크가 삭제되었습니다.');
             } else {
                 alert('삭제가 정상적으로 처리되지 않았습니다.');
             }
-            router.refresh();
         }
 
         return true;

@@ -87,8 +87,9 @@ export default function BookmarkInputForm({ onClose, link, type, bookmarkIdx }: 
                     }
                 });
                 if (responseData.status === 200) {
-                    alert('북마크가 추가되었습니다.');
                     onClose();
+                    alert('북마크가 추가되었습니다.');
+                    return;
                 }
             } else {
                 const responseData = await API({
@@ -101,8 +102,9 @@ export default function BookmarkInputForm({ onClose, link, type, bookmarkIdx }: 
                     }
                 });
                 if (responseData.status === 200) {
-                    alert('북마크가 변경되었습니다.');
                     onClose();
+                    alert('북마크가 변경되었습니다.');
+                    return;
                 }
             }
         } catch (error) {
