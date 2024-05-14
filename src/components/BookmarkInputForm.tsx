@@ -257,6 +257,7 @@ export default function BookmarkInputForm({ onClose, link, type, bookmarkIdx }: 
                         type="button"
                         className="rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300"
                         onClick={() => handleSubmit(type)}
+                        disabled={submitLoading}
                     >
                         {type === 'register' ? '등록' : '수정'}
                     </button>

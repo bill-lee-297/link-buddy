@@ -21,9 +21,11 @@ const BookmarkList = ({ data, folderName }: Props) => {
     const [currentUrl, setCurrentUrl] = useState('');
     const [openModal, setOpenModal] = useState(false);
     const [openModalIdx, setOpenModalIdx] = useState(0);
+    const [deleteLoading, setDeleteLoading] = useState(false);
 
     const handleDeleteBookmark = async (idx: number) => {
         if (window.confirm('삭제하시겠습니까?')) {
+            setDeleteLoading(true);
             const responseData = await API({
                 endpoint: '/api/bookmark',
                 method: 'DELETE',
@@ -38,6 +40,7 @@ const BookmarkList = ({ data, folderName }: Props) => {
             } else {
                 alert('삭제가 정상적으로 처리되지 않았습니다.');
             }
+            setDeleteLoading(false);
         }
 
         return true;
@@ -112,6 +115,7 @@ const BookmarkList = ({ data, folderName }: Props) => {
                                             type="button"
                                             className="rounded-lg bg-red-700 px-3 py-2 text-xs font-medium text-white hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
                                             onClick={() => handleDeleteBookmark(v.bookmarkIdx)}
+                                            disabled={deleteLoading}
                                         >
                                             삭제
                                         </button>
