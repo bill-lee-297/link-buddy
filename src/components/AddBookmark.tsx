@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import AddBookmarkForm from '@/components/AddBookmarkForm';
+import BookmarkInputForm from '@/components/BookmarkInputForm';
 import ModalPortal from '@/components/modal/ModalPortal';
 
 export default function AddBookmark() {
@@ -46,7 +46,7 @@ export default function AddBookmark() {
 
             {openModal && (
                 <ModalPortal>
-                    <AddBookmarkForm onClose={() => setOpenModal(false)} link={inputLink} />
+                    <BookmarkInputForm onClose={() => setOpenModal(false)} link={inputLink} type="register" />
                 </ModalPortal>
             )}
         </div>

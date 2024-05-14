@@ -1,12 +1,14 @@
 'use client';
 
-import { SyntheticEvent, useEffect, useState } from 'react';
+import React, { SyntheticEvent, useEffect, useState } from 'react';
 
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
+import BookmarkInputForm from '@/components/BookmarkInputForm';
 import Favicon from '@/components/Icons/Favicon';
-import { API } from '@/lib/utils';
+import ModalPortal from '@/components/modal/ModalPortal';
+import { API, isValidUrl } from '@/lib/utils';
 import { bookmark } from '@/service/bookmark';
 
 type Props = {
@@ -17,6 +19,8 @@ type Props = {
 const BookmarkList = ({ data, folderName }: Props) => {
     const router = useRouter();
     const [currentUrl, setCurrentUrl] = useState('');
+    const [openModal, setOpenModal] = useState(false);
+    const [openModalIdx, setOpenModalIdx] = useState(0);
 
     const handleDeleteBookmark = async (idx: number) => {
         if (window.confirm('삭제하시겠습니까?')) {
@@ -42,46 +46,92 @@ const BookmarkList = ({ data, folderName }: Props) => {
         e.currentTarget.src = `${currentUrl}bookmark_ic.png`;
     };
 
+    const handleEditBookmark = (idx: number) => {
+        setOpenModal(true);
+        setOpenModalIdx(idx);
+    };
+
+    const clickLink = (link: string) => {};
+
     useEffect(() => {
         setCurrentUrl(window.location.href);
     }, []);
 
     return (
-        <div className="flex flex-col">
-            {data.length === 0 ? (
+        <>
+            {data.length < 1 && (
                 <div className="mt-6 flex justify-center text-lg text-gray-500">
                     추가된 즐겨찾기가 존재하지 않습니다. 자주 방문하는 사이트를 등록해보세요.
                 </div>
-            ) : (
-                <div className="mb-4 text-3xl text-gray-600">{folderName}</div>
             )}
 
-            <ul className="w-[400px]">
-                {data.map((v) => (
-                    <li key={v.bookmarkIdx} className="mb-6 flex items-center justify-between">
-                        <div className="flex flex-row">
-                            <div className="mr-2 h-[20px] w-[20px]">
-                                <Favicon bookmarkImage={v.bookmarkImage} bookmarkName={v.bookmarkName} />
-                            </div>
-                            <div className="w-[260px] truncate">
-                                <a href={v.bookmarkLink} className="text-sm font-semibold">
-                                    {v.bookmarkName}
-                                </a>
-                            </div>
-                        </div>
-                        <div>
-                            <button
-                                type="button"
-                                className="rounded-lg bg-red-700 px-3 py-2 text-xs font-medium text-white hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
-                                onClick={() => handleDeleteBookmark(v.bookmarkIdx)}
-                            >
-                                삭제
-                            </button>
-                        </div>
-                    </li>
-                ))}
-            </ul>
-        </div>
+            {data.length > 0 && (
+                <div className="flex flex-col rounded-2xl">
+                    {folderName !== 'default' && <div className="px-6 py-2 text-3xl text-gray-600 ">folderName</div>}
+
+                    {folderName !== 'default' && <div className="border-b-2" />}
+
+                    <div className="">
+                        <ul className="w-[430px]">
+                            {data.map((v) => (
+                                <li
+                                    key={v.bookmarkIdx}
+                                    className="flex items-center justify-between px-4 py-2 hover:bg-gray-100"
+                                >
+                                    <div className="flex flex-row">
+                                        <a
+                                            href={
+                                                isValidUrl(v.bookmarkLink) ? v.bookmarkLink : `http://${v.bookmarkLink}`
+                                            }
+                                            className="flex flex-row"
+                                            target="_blank"
+                                            rel="noreferrer"
+                                        >
+                                            <div className="mr-2 h-[20px] w-[20px]">
+                                                <Favicon
+                                                    bookmarkImage={v.bookmarkImage}
+                                                    bookmarkName={v.bookmarkName}
+                                                />
+                                            </div>
+                                            <div className="w-[260px] truncate">
+                                                <span className="text-sm font-semibold">{v.bookmarkName}</span>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div>
+                                        <button
+                                            type="button"
+                                            className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs font-medium text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700"
+                                            onClick={() => handleEditBookmark(v.bookmarkIdx)}
+                                        >
+                                            수정
+                                        </button>
+                                    </div>
+                                    <div>
+                                        <button
+                                            type="button"
+                                            className="rounded-lg bg-red-700 px-3 py-2 text-xs font-medium text-white hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+                                            onClick={() => handleDeleteBookmark(v.bookmarkIdx)}
+                                        >
+                                            삭제
+                                        </button>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                    {openModal && (
+                        <ModalPortal>
+                            <BookmarkInputForm
+                                onClose={() => setOpenModal(false)}
+                                bookmarkIdx={openModalIdx}
+                                type="edit"
+                            />
+                        </ModalPortal>
+                    )}
+                </div>
+            )}
+        </>
     );
 };
 

@@ -1,6 +1,7 @@
 import { db } from '@vercel/postgres';
 import _ from 'lodash';
 import { getServerSession } from 'next-auth';
+import { BiLogIn } from 'react-icons/bi';
 
 import { AuthOptions } from '@/app/api/auth/[...nextauth]/route';
 
@@ -27,7 +28,54 @@ type insertBookmark = {
     faviconImage: string;
 };
 
+type updateBookmark = {
+    bookmarkIdx: number;
+    url: string;
+    name: string;
+};
+
 export type bookmarks = bookmark & folder;
+
+const getBookmarkDetail = async (bookmarkIdx: number) => {
+    const session = await getServerSession(AuthOptions);
+    const userEmail = session?.user?.email;
+
+    if (!userEmail) {
+        return {
+            status: 401,
+            message: '로그인이 필요한 기능입니다.'
+        };
+    }
+
+    const client = await db.connect();
+    const data = await client.sql`
+            SELECT 
+                folder_idx,
+                folder_name,
+                folder_order,
+                folder_background_color,
+                bookmark_idx,
+                bookmark_name,
+                bookmark_link,
+                bookmark_image,
+                bookmark_order,
+                bookmark_folder_idx
+            FROM 
+                users 
+            LEFT JOIN 
+                folders on users.user_idx = folders.folders_user_idx 
+            LEFT JOIN 
+                bookmarks on folders.folder_idx = bookmarks.bookmark_folder_idx 
+            WHERE 
+                users.user_email = ${userEmail} AND bookmarks.bookmark_idx = ${bookmarkIdx}`;
+
+    const bookmarkData = data.rows[0];
+
+    return {
+        status: 'success',
+        data: bookmarkData
+    };
+};
 
 const getBookmarks = async () => {
     const session = await getServerSession(AuthOptions);
@@ -159,6 +207,57 @@ const postBookmarks = async (bookmark: insertBookmark) => {
     };
 };
 
+const putBookmark = async (bookmark: updateBookmark) => {
+    const session = await getServerSession(AuthOptions);
+    const userEmail = session?.user?.email;
+
+    if (!userEmail) {
+        return {
+            status: 'error',
+            message: '로그인 정보가 필요합니다.'
+        };
+    }
+
+    const client = await db.connect();
+    const result = await client.sql`
+            SELECT 
+                user_idx
+            FROM 
+                users as users
+            LEFT JOIN
+                bookmarks as bookmarks ON users.user_idx = bookmarks.bookmark_user_idx
+            WHERE 
+                users.user_email = ${userEmail} AND bookmarks.bookmark_idx  = ${bookmark.bookmarkIdx}`;
+
+    if (result.rows.length === 0) {
+        return {
+            status: 'error',
+            message: '사용자 정보와 일치하지 않습니다.'
+        };
+    }
+
+    const data = await client.sql`
+                UPDATE 
+                    bookmarks 
+                SET 
+                    bookmark_name = ${bookmark.name}, 
+                    bookmark_link = ${bookmark.url} 
+                WHERE 
+                    bookmark_idx = ${bookmark.bookmarkIdx}`;
+
+    if (data.rowCount === 1) {
+        return {
+            status: 'success',
+            message: '성공적으로 수정되었습니다.'
+        };
+    }
+
+    return {
+        status: 'error',
+        message: '수정이 실패하였습니다.'
+    };
+};
+
 const deleteBookmark = async (bookmarkIdx: number) => {
     const session = await getServerSession(AuthOptions);
     const userEmail = session?.user?.email;
@@ -205,4 +304,4 @@ const deleteBookmark = async (bookmarkIdx: number) => {
     };
 };
 
-export { getBookmarks, postBookmarks, deleteBookmark };
+export { getBookmarkDetail, getBookmarks, postBookmarks, deleteBookmark, putBookmark };

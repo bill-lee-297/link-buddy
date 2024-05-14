@@ -6,10 +6,12 @@ import { API, isValidUrl } from '@/lib/utils';
 
 type Props = {
     onClose: () => void;
-    link: string;
+    link?: string;
+    type: 'register' | 'edit';
+    bookmarkIdx?: number;
 };
 
-export default function AddBookmarkForm({ onClose, link }: Props) {
+export default function BookmarkInputForm({ onClose, link, type, bookmarkIdx }: Props) {
     const nameElement = useRef(null);
     const submitBtnElement = useRef(null);
     const [inputLink, setInputLink] = useState(link);
@@ -54,11 +56,16 @@ export default function AddBookmarkForm({ onClose, link }: Props) {
         setFaviconImage('');
     };
 
-    const handleSubmit = async () => {
+    const handleSubmit = async (type: 'register' | 'edit') => {
         if (inputLink.length === 0) {
             alert('북마크의 URL을 입력해주세요.');
             return;
         }
+        if (!isValidUrl(inputLink)) {
+            alert('올바르지 않은 URL 입니다.');
+            return;
+        }
+
         if (name.length === 0) {
             alert('북마크의 이름을 입력해주세요.');
             return;
@@ -66,22 +73,37 @@ export default function AddBookmarkForm({ onClose, link }: Props) {
         setSubmitLoading(true);
 
         try {
-            const favicon = await getCrawlingData('favicon');
+            if (type === 'register') {
+                const favicon = await getCrawlingData('favicon');
 
-            const responseData = await API({
-                endpoint: '/api/bookmark',
-                method: 'POST',
-                body: {
-                    url: inputLink,
-                    name,
-                    order: 0,
-                    faviconImage: favicon
+                const responseData = await API({
+                    endpoint: '/api/bookmark',
+                    method: 'POST',
+                    body: {
+                        url: inputLink,
+                        name,
+                        order: 0,
+                        faviconImage: favicon
+                    }
+                });
+                if (responseData.status === 200) {
+                    alert('북마크가 추가되었습니다.');
+                    onClose();
                 }
-            });
-
-            if (responseData.status === 200) {
-                alert('북마크가 추가되었습니다.');
-                onClose();
+            } else {
+                const responseData = await API({
+                    endpoint: '/api/bookmark',
+                    method: 'PUT',
+                    body: {
+                        bookmarkIdx,
+                        url: inputLink,
+                        name
+                    }
+                });
+                if (responseData.status === 200) {
+                    alert('북마크가 변경되었습니다.');
+                    onClose();
+                }
             }
         } catch (error) {
             alert('오류가 발생하였습니다.');
@@ -100,6 +122,30 @@ export default function AddBookmarkForm({ onClose, link }: Props) {
             }
         }
     };
+
+    const getBookmarkData = async () => {
+        setSubmitLoading(true);
+
+        const result = await API({
+            endpoint: `/api/bookmark`,
+            method: 'GET',
+            params: {
+                bookmarkIdx
+            }
+        });
+
+        const { bookmark_name, bookmark_link } = result.data;
+
+        setName(bookmark_name);
+        setInputLink(bookmark_link);
+        setSubmitLoading(false);
+    };
+
+    useEffect(() => {
+        if (type === 'edit') {
+            getBookmarkData();
+        }
+    }, [bookmarkIdx]);
 
     useEffect(() => {
         if (nameElement.current) {
@@ -120,7 +166,7 @@ export default function AddBookmarkForm({ onClose, link }: Props) {
         >
             <div className="display relative flex w-600 flex-col rounded-2xl bg-white">
                 <div className="p-4">
-                    <h1 className="text-xl">북마크 등록</h1>
+                    <h1 className="text-xl">북마크 {type === 'register' ? '등록' : '수정'}</h1>
                 </div>
                 <div className="border-b-2 border-b-gray-200 " />
                 <div className="flex flex-col gap-8 px-4 py-6">
@@ -182,7 +228,17 @@ export default function AddBookmarkForm({ onClose, link }: Props) {
                             />
                         </div>
                         {!isValidUrl(inputLink) && (
-                            <div className="mt-4 text-right text-gray-600">URL이 맞나요? 다시 한번 확인해주세요.</div>
+                            <div className="mt-2 flex flex-row items-center justify-end ">
+                                {/* <div className="mr-2 text-right text-gray-600">URL을 확인해주세요.</div> */}
+                                <a
+                                    className="text-sm text-blue-500 underline"
+                                    href="https://www.notion.so/kukjin/LinkBuddy-aa990d424ad545df8439a0d2c969294c?pvs=4#7ec653a3bebf473db3fe3c913e5c208b"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                >
+                                    URL은 이렇게 입력해주세요.
+                                </a>
+                            </div>
                         )}
                     </div>
                 </div>
@@ -198,9 +254,9 @@ export default function AddBookmarkForm({ onClose, link }: Props) {
                         ref={submitBtnElement}
                         type="button"
                         className="rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300"
-                        onClick={() => handleSubmit()}
+                        onClick={() => handleSubmit(type)}
                     >
-                        등록
+                        {type === 'register' ? '등록' : '수정'}
                     </button>
                 </div>
                 {submitLoading && (
