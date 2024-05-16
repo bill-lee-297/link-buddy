@@ -13,6 +13,8 @@ export default async function BookmarksArea() {
                     <a
                         href="https://kukjin.notion.site/LinkBuddy-aa990d424ad545df8439a0d2c969294c?pvs=4"
                         className="mb-2 me-2 rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700"
+                        target="_blank"
+                        rel="noreferrer"
                     >
                         링크버디란?
                     </a>
