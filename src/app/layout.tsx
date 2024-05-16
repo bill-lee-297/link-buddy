@@ -6,6 +6,8 @@ import Header from '@/components/Header';
 import AuthContext from '@/context/AuthContext';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 
+import { SpeedInsights } from '@vercel/speed-insights/next';
+
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
@@ -27,6 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <div id="portal" />
             </body>
             <GoogleAnalytics gaId="G-L9C7BEEQEV" />
+            <SpeedInsights />
         </html>
     );
 }
