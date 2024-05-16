@@ -8,7 +8,7 @@ export default async function BookmarksArea() {
         return (
             <div className="flex h-[400px] w-full flex-col items-center justify-center text-center">
                 링크버디는 하나의 계정으로 북마크를 관리할 수 있습니다. <br />
-                브라우저 마다 관리하기 힘들었던 북마크를 한 곳에서 관리해보세요. <br />
+                브라우저마다 관리하기 힘들었던 북마크를 한 곳에서 관리해보세요. <br />
                 <div className="mt-10 flex flex-row items-center justify-center gap-4">
                     <a
                         href="https://kukjin.notion.site/LinkBuddy-aa990d424ad545df8439a0d2c969294c?pvs=4"
