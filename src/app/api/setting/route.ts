@@ -6,7 +6,7 @@ const GET = async () => {
     try {
         const responseData = await getSetting();
 
-        if (responseData.status === 200) {
+        if (responseData.status === 'success') {
             return NextResponse.json({
                 status: 200,
                 data: responseData.data

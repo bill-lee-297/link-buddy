@@ -12,7 +12,7 @@ export default function Header() {
     const { data: session } = useSession();
     const [openModal, setOpenModal] = useState(false);
     const closeModal = () => {
-        // window.location.reload();
+        window.location.reload();
         setOpenModal(false);
     };
 
@@ -28,23 +28,9 @@ export default function Header() {
                     <nav className="flex items-center">
                         <ul className="flex flex-row items-center justify-end">
                             {session && (
-                                <>
-                                    {/* {session.user?.image && ( */}
-                                    {/*    <li className=""> */}
-                                    {/*        <img */}
-                                    {/*            className="rounded-2xl" */}
-                                    {/*            src={session?.user?.image} */}
-                                    {/*            width="30" */}
-                                    {/*            height="30" */}
-                                    {/*            alt="profile" */}
-                                    {/*        /> */}
-                                    {/*    </li> */}
-                                    {/* )} */}
-                                    {/* <li className="">{session.user?.name || ''}</li> */}
-                                    <li onClick={() => setOpenModal(true)} className="cursor-pointer">
-                                        <img className="h-[20px] w-[20px]" src="/setting_ic.png" alt="setting button" />
-                                    </li>
-                                </>
+                                <li onClick={() => setOpenModal(true)} className="cursor-pointer">
+                                    <img className="h-[20px] w-[20px]" src="/setting_ic.png" alt="setting button" />
+                                </li>
                             )}
                             <li>{!session && <button onClick={() => signIn()}>로그인</button>}</li>
                         </ul>

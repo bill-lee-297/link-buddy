@@ -28,6 +28,8 @@ const Settings = ({ onClose }: Props) => {
             if (response.status === 200) {
                 if (response.data?.target_blank) {
                     setNewTabValue(response.data.target_blank === 'Y');
+                } else {
+                    alert('오류가 발생하였습니다. 잠시 후에 다시 시도해주세요.');
                 }
             }
         } catch (e) {
