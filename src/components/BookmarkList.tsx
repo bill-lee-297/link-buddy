@@ -10,6 +10,7 @@ import Favicon from '@/components/Icons/Favicon';
 import ModalPortal from '@/components/modal/ModalPortal';
 import { API, isValidUrl } from '@/lib/utils';
 import { bookmark } from '@/service/bookmark';
+import { getSetting } from '@/service/setting';
 
 type Props = {
     data: bookmark[];
@@ -22,6 +23,7 @@ const BookmarkList = ({ data, folderName }: Props) => {
     const [openModal, setOpenModal] = useState(false);
     const [openModalIdx, setOpenModalIdx] = useState(0);
     const [deleteLoading, setDeleteLoading] = useState(false);
+    const [targetBlank, setTargetBlank] = useState(false);
 
     const handleDeleteBookmark = async (idx: number) => {
         if (window.confirm('삭제하시겠습니까?')) {
@@ -54,10 +56,22 @@ const BookmarkList = ({ data, folderName }: Props) => {
         setOpenModalIdx(idx);
     };
 
-    const clickLink = (link: string) => {};
+    const getSettingData = async () => {
+        const response = await API({
+            endpoint: '/api/setting',
+            method: 'GET'
+        });
+
+        if (response.status === 200) {
+            if (response.data?.target_blank) {
+                setTargetBlank(response.data.target_blank === 'Y');
+            }
+        }
+    };
 
     useEffect(() => {
         setCurrentUrl(window.location.href);
+        getSettingData();
     }, []);
 
     return (
@@ -87,8 +101,7 @@ const BookmarkList = ({ data, folderName }: Props) => {
                                                 isValidUrl(v.bookmarkLink) ? v.bookmarkLink : `http://${v.bookmarkLink}`
                                             }
                                             className="flex flex-row"
-                                            target="_blank"
-                                            rel="noreferrer"
+                                            {...(targetBlank ? { target: '_blank', rel: 'noreferrer' } : {})}
                                         >
                                             <div className="mr-2 h-[20px] w-[20px]">
                                                 <Favicon

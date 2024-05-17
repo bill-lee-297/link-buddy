@@ -1,9 +1,20 @@
 'use client';
 
+import React, { useState } from 'react';
+
+import { useRouter } from 'next/navigation';
 import { useSession, signIn, signOut } from 'next-auth/react';
+
+import ModalPortal from '@/components/modal/ModalPortal';
+import Settings from '@/components/Settings';
 
 export default function Header() {
     const { data: session } = useSession();
+    const [openModal, setOpenModal] = useState(false);
+    const closeModal = () => {
+        // window.location.reload();
+        setOpenModal(false);
+    };
 
     return (
         <header className="flex w-full justify-center border-b-2 border-gray-200 px-10 py-6">
@@ -15,30 +26,36 @@ export default function Header() {
                 </div>
                 <div className="">
                     <nav className="flex items-center">
-                        <ul className="flex items-center gap-4">
-                            {session?.user?.image && (
-                                <li className="">
-                                    <img
-                                        className="rounded-2xl"
-                                        src={session?.user?.image}
-                                        width="30"
-                                        height="30"
-                                        alt="profile"
-                                    />
-                                </li>
+                        <ul className="flex flex-row items-center justify-end">
+                            {session && (
+                                <>
+                                    {/* {session.user?.image && ( */}
+                                    {/*    <li className=""> */}
+                                    {/*        <img */}
+                                    {/*            className="rounded-2xl" */}
+                                    {/*            src={session?.user?.image} */}
+                                    {/*            width="30" */}
+                                    {/*            height="30" */}
+                                    {/*            alt="profile" */}
+                                    {/*        /> */}
+                                    {/*    </li> */}
+                                    {/* )} */}
+                                    {/* <li className="">{session.user?.name || ''}</li> */}
+                                    <li onClick={() => setOpenModal(true)} className="cursor-pointer">
+                                        <img className="h-[20px] w-[20px]" src="/setting_ic.png" alt="setting button" />
+                                    </li>
+                                </>
                             )}
-                            <li className="">{session ? session.user?.name : ''}</li>
-                            <li>
-                                {session ? (
-                                    <button onClick={() => signOut()}>Sign Out</button>
-                                ) : (
-                                    <button onClick={() => signIn()}>Sign In</button>
-                                )}
-                            </li>
+                            <li>{!session && <button onClick={() => signIn()}>로그인</button>}</li>
                         </ul>
                     </nav>
                 </div>
             </div>
+            {openModal && (
+                <ModalPortal>
+                    <Settings onClose={() => closeModal()} />
+                </ModalPortal>
+            )}
         </header>
     );
 }

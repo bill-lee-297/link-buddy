@@ -31,6 +31,7 @@ export default async function addUser(user: OAuthUser) {
     const userIdx = insertResult.rows[0].user_idx;
 
     await client.sql`INSERT INTO folders (folder_name, folder_order, folders_user_idx) VALUES ('default', 0, ${userIdx})`;
+    await client.sql`INSERT INTO settings (user_idx, target_blank) VALUES (${userIdx}, 'N')`;
 
     return true;
 }

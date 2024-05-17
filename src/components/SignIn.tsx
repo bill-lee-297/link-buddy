@@ -17,7 +17,7 @@ export default function SignIn({ providers, callbackUrl }: Props) {
                     className="mb-10 w-1/4 rounded-lg border-2 border-gray-400 py-4 text-center font-medium text-gray-500"
                     onClick={() => signIn(provider.id, { callbackUrl })}
                 >
-                    Sign in with {provider.name}
+                    {provider.name} 로그인
                 </button>
             ))}
         </div>
