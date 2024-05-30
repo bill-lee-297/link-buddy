@@ -6,11 +6,11 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 import BookmarkInputForm from '@/components/BookmarkInputForm';
+import FolderInputForm from '@/components/FolderInputForm';
 import Favicon from '@/components/Icons/Favicon';
 import ModalPortal from '@/components/modal/ModalPortal';
 import { API, isValidUrl } from '@/lib/utils';
 import { bookmark } from '@/service/bookmark';
-import { getSetting } from '@/service/setting';
 
 type Props = {
     data: bookmark[];
@@ -22,6 +22,7 @@ const BookmarkList = ({ data, folderName }: Props) => {
     const [currentUrl, setCurrentUrl] = useState('');
     const [openModal, setOpenModal] = useState(false);
     const [openModalIdx, setOpenModalIdx] = useState(0);
+    const [openFolderModal, setOpenFolderModal] = useState(false);
     const [deleteLoading, setDeleteLoading] = useState(false);
     const [targetBlank, setTargetBlank] = useState(false);
 
@@ -83,7 +84,7 @@ const BookmarkList = ({ data, folderName }: Props) => {
             )}
 
             {data.length > 0 && (
-                <div className="flex flex-col rounded-2xl">
+                <div className="flex flex-col rounded-2xl bg-gray-200">
                     {folderName !== 'default' && <div className="px-6 py-2 text-3xl text-gray-600 ">folderName</div>}
 
                     {folderName !== 'default' && <div className="border-b-2" />}
@@ -147,6 +148,20 @@ const BookmarkList = ({ data, folderName }: Props) => {
                         </ModalPortal>
                     )}
                 </div>
+            )}
+
+            <div
+                className="flex h-[100px] w-[100px] cursor-pointer flex-col items-center justify-center"
+                onClick={() => setOpenFolderModal(true)}
+            >
+                <Image src="/add_ic.png" alt="folder add icon" width="40" height="40" />
+                <div className="mt-2">폴더생성</div>
+            </div>
+
+            {openFolderModal && (
+                <ModalPortal>
+                    <FolderInputForm onClose={() => setOpenFolderModal(false)} />
+                </ModalPortal>
             )}
         </>
     );

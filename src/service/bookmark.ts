@@ -1,7 +1,6 @@
 import { db } from '@vercel/postgres';
 import _ from 'lodash';
 import { getServerSession } from 'next-auth';
-import { BiLogIn } from 'react-icons/bi';
 
 import { AuthOptions } from '@/app/api/auth/[...nextauth]/route';
 
