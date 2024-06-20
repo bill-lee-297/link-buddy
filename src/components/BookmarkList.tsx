@@ -47,9 +47,6 @@ const BookmarkList = ({ data, folderName }: Props) => {
 
         return true;
     };
-    const handleImgError = (e: SyntheticEvent<HTMLImageElement, Event>) => {
-        e.currentTarget.src = `${currentUrl}bookmark_ic.png`;
-    };
 
     const handleEditBookmark = (idx: number) => {
         setOpenModal(true);
